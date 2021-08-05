@@ -1,42 +1,54 @@
-
 import './App.css';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Button, FormControl, Input, InputLabel} from "@material-ui/core";
 import Todo from "./componets/Todo";
+import {db} from "./firebase";
+import firebase from "firebase";
 
 function App() {
 
-  const [todos,setTodos] = useState([]);
-  const [input,setInput] = useState('');
+    const [todos, setTodos] = useState([]);
+    const [input, setInput] = useState('');
 
-  const addTodo =(event)=>{
-      event.preventDefault();
-      setTodos([...todos,input]);
-      setInput('');
-  }
 
-  return (
-    <div className="App">
-     <h1>Hello world</h1>
-        <form>
+    useEffect(() => {
+        db.collection('todos').orderBy('timestamp','desc').onSnapshot(snapshot => {
+            setTodos(snapshot.docs.map(doc => doc.data().todo));
+        })
 
-            <FormControl>
-                <InputLabel> Write a Todo</InputLabel>
-                <Input onChange={event => setInput(event.target.value)} value={input}/>
-            </FormControl>
-            <Button disabled={!input} variant='contained' color='primary' type='submit' onClick={addTodo} >Add Todo
-            </Button>
+    }, []);
+    const addTodo = (event) => {
+        event.preventDefault();
 
-        </form>
-        <ul>
-            {todos.map(todo=>(
+        db.collection('todos').add({
+            todo: input,
+            timestamp:firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        setInput('');
+    }
 
-              <Todo todo={todo}/>
-            ))}
+    return (
+        <div className="App">
+            <h1>Hello codersHub fam </h1>
+            <form>
 
-        </ul>
-    </div>
-  );
+                <FormControl>
+                    <InputLabel> Write a Todo</InputLabel>
+                    <Input onChange={event => setInput(event.target.value)} value={input}/>
+                </FormControl>
+                <Button disabled={!input} variant='contained' color='primary' type='submit' onClick={addTodo}>Add Todo
+                </Button>
+
+            </form>
+            <ul>
+                {todos.map(todo => (
+
+                    <Todo todo={todo}/>
+                ))}
+
+            </ul>
+        </div>
+    );
 }
 
 export default App;
