@@ -1,7 +1,9 @@
 .App {
   text-align: center;
 }
-
+.empty_todo{
+    margin-top: 10rem;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;

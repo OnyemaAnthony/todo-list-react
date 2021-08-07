@@ -17,13 +17,15 @@ function App() {
         })
 
     }, []);
-    const addTodo = (event) => {
+    const addTodo = async (event) => {
         event.preventDefault();
+        if(input.trim()){
+           await db.collection('todos').add({
+                todo: input,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            })
+        }
 
-        db.collection('todos').add({
-            todo: input,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        })
         setInput('');
     }
 
@@ -40,13 +42,20 @@ function App() {
                 </Button>
 
             </form>
-            <ul>
+            {todos.length <= 0 ? <h1 className='empty_todo'>You dont have a todo yet</h1> :
+
+                <ul>
                 {todos.map(todo => (
 
                     < Todo todo={todo}/>
-                ))}
+                ))
+
+                }
 
             </ul>
+
+            }
+
         </div>
     );
 }
